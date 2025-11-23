@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'Practica08_Guiado.json' # Solo se ejecuta si el flujo cambia
+      - 'workflows/P08/Practica08_Guiado.json' # Solo se ejecuta si el flujo cambia
 
 jobs:
   deploy:
@@ -28,4 +28,4 @@ jobs:
           N8N_API_KEY: ${{ secrets.N8N_PROD_API_KEY }}
           # (Importante: usar el ID para actualizar, no crear uno nuevo)
         run: |
-          n8n import:workflow --file=Practica08_Guiado.json --id=1 
+          n8n import:workflow --file=workflows/P08/Practica08_Guiado.json --id=NuU6gODjOrwlnpGL
