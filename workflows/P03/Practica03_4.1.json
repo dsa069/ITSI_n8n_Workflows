@@ -1,0 +1,418 @@
+{
+  "name": "Practica03_4.1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c3e42c27-59be-4863-b601-d4c7a3df82e0",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://v2.jokeapi.dev/joke/Programming,Misc,Dark?type=single&amount=10",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "4f7602ac-0c7b-48ff-a704-f5cccf8de557",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "jokes",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "3871c5c4-29d5-4722-b921-222a9d66f0a8",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.jokes.category }}",
+                    "rightValue": "Programming",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "88a40cdb-30dd-469d-8e3e-530f06b7b6cd"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "68bbc5f3-4446-4bf8-bc75-2d6fa6a3e420",
+                    "leftValue": "={{ $json.jokes.category }}",
+                    "rightValue": "Misc",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "fec527ae-9d4e-4e99-94c7-1b7c47377d67",
+                    "leftValue": "={{ $json.jokes.category }}",
+                    "rightValue": "Dark",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "efa3add3-9acc-447c-b1a0-e417657af8fd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Cx4gN8PQWN8ReEqymwoL-3EKCxfNNG-RhmhhjJX0YBE",
+          "mode": "list",
+          "cachedResultName": "Clasificación de Chistes n8n",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Cx4gN8PQWN8ReEqymwoL-3EKCxfNNG-RhmhhjJX0YBE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 303569157,
+          "mode": "list",
+          "cachedResultName": "Todos",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Cx4gN8PQWN8ReEqymwoL-3EKCxfNNG-RhmhhjJX0YBE/edit#gid=303569157"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Chiste": "={{ $('Split Out').item.json.jokes.joke }}",
+            "ID": "={{ $('Split Out').item.json.jokes.id }}",
+            "Fecha de Procesamiento": "={{ $now }}",
+            "categoria_original": "={{ $json.categoria_original }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Chiste",
+              "displayName": "Chiste",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Fecha de Procesamiento",
+              "displayName": "Fecha de Procesamiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria_original",
+              "displayName": "categoria_original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        48
+      ],
+      "id": "30b72b27-cd9c-4eda-9db5-ecf018fecd1b",
+      "name": "Todos sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf74d0e5-4217-4573-a3bf-23eb6ca14dc8",
+              "name": "categoria_original",
+              "value": "=Programming",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        -112
+      ],
+      "id": "c2f92444-c3cb-4d4e-8b15-c156bad6cb60",
+      "name": "Display Programming"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf74d0e5-4217-4573-a3bf-23eb6ca14dc8",
+              "name": "categoria_original",
+              "value": "=Misc",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        48
+      ],
+      "id": "27c25efa-e2ec-4659-a51d-d710b9a24d23",
+      "name": "Display Misc"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "cf74d0e5-4217-4573-a3bf-23eb6ca14dc8",
+              "name": "categoria_original",
+              "value": "=Dark",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        224
+      ],
+      "id": "b03600f2-3a26-4afa-b266-05d5c779a4b5",
+      "name": "Display Dark"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1104,
+        32
+      ],
+      "id": "fa0a359c-3cf3-46c4-8666-44f10a3977db",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Display Programming",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Display Misc",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Display Dark",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Todos sheet": {
+      "main": [
+        []
+      ]
+    },
+    "Display Programming": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Display Misc": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Display Dark": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Todos sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8b450caa-0671-4ddb-ac79-e96447fa12ec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "Z11x0Fpnxb6pp0CZ",
+  "tags": []
+}

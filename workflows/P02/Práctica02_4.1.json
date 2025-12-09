@@ -1,0 +1,197 @@
+{
+  "name": "Práctica02_4.1",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3bcae900-1cc1-4923-b093-7ca3e6cf8a30",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://v2.jokeapi.dev/joke/Programming,Miscellaneous?type=single&amount=5",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "03d8a375-6f55-4149-9b9a-b88ba1e8651e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "jokes",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "38dca373-2629-4e80-bad3-d6deda2122c2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f976cc91-ea33-4e93-85d6-1f6317dec417",
+              "leftValue": "={{ $json.jokes.category }}",
+              "rightValue": "Programming",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "fc09d631-ffdd-4b27-a929-10dd18c52f29",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "165475fe-f640-4ffd-80ef-b5db48ff0a1f",
+              "name": "Categoría",
+              "value": "Chiste de programación",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "d53cdb78-c894-4fa9-b61b-6fb20d66ab1b",
+      "name": "Categoría programación"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "28f26aa9-84c8-45d3-b149-19da94a7822c",
+              "name": "Categoría",
+              "value": "Chiste misceláneo",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        832,
+        96
+      ],
+      "id": "c0f415a0-6cf4-49bb-8ec3-cc7f667e8ebb",
+      "name": "Categoría Misc"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Categoría programación",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Categoría Misc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b9d27245-1024-49dc-ad28-0706b79a815f",
+  "meta": {
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "GGaOVD8AnKXmyXut",
+  "tags": []
+}

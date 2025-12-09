@@ -1,0 +1,199 @@
+{
+  "name": "Practica07_4.2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "647927b3-dc70-4201-aaa2-83e18d3e09b2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3c3b856e-3e15-4584-b021-e4656bfee974",
+      "name": "Webhook",
+      "webhookId": "647927b3-dc70-4201-aaa2-83e18d3e09b2"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extrae las siguientes entidades del texto. Responde ÚNICAMENTE con un objeto JSON válido con las claves \"email_cliente\", \"tipo_problema\" (ej. \"error\", \"consulta\") y \"id_incidencia\". Si un valor no se encuentra, usa \"null\".\n\nTexto: \"{{ $json.body.texto }}\"\n\nEjemplo de escructura con el formato a seguir:\n\n{\\n\"email_cliente\": \"email@gmail.com\",\\n\"tipo_problema\": \"explisión\",\\n\"id_incidencia\": \"8\"\\n}"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "fd9dc2b1-80ec-45d9-b50c-01c650a2c49a",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Ct6OZR9geOMesFj",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "403f6ab9-5c84-4a75-8725-bb1db13261bd",
+              "name": "incidencia",
+              "value": "={{ JSON.parse($json.content.parts[0].text).id_incidencia}}",
+              "type": "string"
+            },
+            {
+              "id": "826758ec-de74-4b08-95a3-167e0a947a3c",
+              "name": "tipo",
+              "value": "={{ JSON.parse($json.content.parts[0].text).tipo_problema}}",
+              "type": "string"
+            },
+            {
+              "id": "b6cb6720-2e76-4ae1-bf1f-fc8f58dbadf0",
+              "name": "email",
+              "value": "={{ JSON.parse($json.content.parts[0].text).email_cliente}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        0
+      ],
+      "id": "f47b1373-1376-4deb-86fd-b00fe572d520",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.email }}",
+                    "rightValue": "@ual.es",
+                    "operator": {
+                      "type": "string",
+                      "operation": "endsWith"
+                    },
+                    "id": "17c871b6-7690-47dd-8afd-5b096a496816"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5cf28268-06fe-4501-951f-f92fd50295d9",
+                    "leftValue": "={{ $json.email }}",
+                    "rightValue": "@gmail.com",
+                    "operator": {
+                      "type": "string",
+                      "operation": "endsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        752,
+        -16
+      ],
+      "id": "5534d2a5-0b5f-489f-93e3-4bf02042ef81",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d47a4fd-228a-4f0c-a5e0-d40444dce669",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "QbilQFWvSe5wjePz",
+  "tags": []
+}

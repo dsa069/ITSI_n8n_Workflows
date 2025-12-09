@@ -1,0 +1,250 @@
+{
+  "name": "Practica07_4.3",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ce58da46-b057-41b2-b24e-486018e29bee",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9a084910-9e81-453e-9916-0ca123da413d",
+              "name": "tema",
+              "value": "Integración de RabbitMQ en n8n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e4670988-fbee-47e0-98e0-6247c4e8ac73",
+      "name": "Generar tema"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Genera 3 ideas para un título de un artículo de blog sobre el tema: \"{{ $json.tema }}\". Responde solo con una lista separada por el carácter \"|\".\n\nEj. Salida: Título 1 | Título 2 | Título 3"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "b7476bc0-73c3-4db1-8ffd-1abaa3d283eb",
+      "name": "Generar títulos del tema",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Ct6OZR9geOMesFj",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "777ff437-a779-42a5-9cb6-bf109b0bf1e4",
+              "name": "Títulos",
+              "value": "={{ $json.content.parts[0].text.split('| ') }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        0
+      ],
+      "id": "3b921ab2-908a-42fa-94f8-338c2ed75ac4",
+      "name": "Splitear a array de títulos"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "Títulos",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        976,
+        0
+      ],
+      "id": "ddc811bd-1df1-44bd-8ca4-3d05ee86d6a2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2b19bc98-10c8-4916-8752-ade3aabba474",
+              "name": "Título",
+              "value": "={{ $('Split Out').item.json['Títulos'] }}",
+              "type": "string"
+            },
+            {
+              "id": "eae3385f-2a42-4846-b005-e922499ec2b3",
+              "name": "Introducción",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1536,
+        0
+      ],
+      "id": "04fc6ab3-37ec-4eb1-941d-e6858f20e6d2",
+      "name": "Merge?"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Escribe un párrafo de introducción (3-4 frases) para un artículo de blog con el siguiente título: \"{{ $json['Títulos'] }}\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "1a30377a-3b2c-4c62-a4ee-321a6440bb58",
+      "name": "Escribir intro del título",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Ct6OZR9geOMesFj",
+          "name": "Gemini Key"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Generar tema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar tema": {
+      "main": [
+        [
+          {
+            "node": "Generar títulos del tema",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generar títulos del tema": {
+      "main": [
+        [
+          {
+            "node": "Splitear a array de títulos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Splitear a array de títulos": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Escribir intro del título",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Escribir intro del título": {
+      "main": [
+        [
+          {
+            "node": "Merge?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "17f39779-718e-4c8a-b9d5-11d34730aa4e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "lGAi0qIHYziCB0EQ",
+  "tags": []
+}

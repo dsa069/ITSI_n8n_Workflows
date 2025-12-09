@@ -1,0 +1,56 @@
+{
+  "name": "Practica03_Guiado_3.2",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1Cx4gN8PQWN8ReEqymwoL-3EKCxfNNG-RhmhhjJX0YBE/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Programming",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Cx4gN8PQWN8ReEqymwoL-3EKCxfNNG-RhmhhjJX0YBE/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "59b05785-5dd4-440c-88bd-a1d0838bb115",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "g0bDEhKif21yrLIW",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "088dc75a-f22c-43ab-b46d-8a9bf4e1d6be",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "Ac3eWvKio0olJJII",
+  "tags": []
+}

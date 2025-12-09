@@ -1,0 +1,170 @@
+{
+  "name": "Manejador de Errores 4.1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a9d658f8-27fc-4d2a-b713-527ce297baff",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1bp5OoFmJgJWYpltF-doUwZayRiQ__x01dbSzSY3qUJs",
+          "mode": "list",
+          "cachedResultName": "Manejador de Errores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bp5OoFmJgJWYpltF-doUwZayRiQ__x01dbSzSY3qUJs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Errores",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1bp5OoFmJgJWYpltF-doUwZayRiQ__x01dbSzSY3qUJs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now }}",
+            "Mensaje de Error": "={{ $json.execution.error.message }}",
+            "URL de Ejecución": "={{ $json.execution.url }}",
+            "Nodo Fallido": "={{ $json.execution.lastNodeExecuted }}",
+            "Workflow Fallido": "={{ $json.workflow.name }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Workflow Fallido",
+              "displayName": "Workflow Fallido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Nodo Fallido",
+              "displayName": "Nodo Fallido",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mensaje de Error",
+              "displayName": "Mensaje de Error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URL de Ejecución",
+              "displayName": "URL de Ejecución",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        96
+      ],
+      "id": "6cbd9dcc-7992-4fbe-b5f1-d0f38cc87962",
+      "name": "Log error",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "danielsalasalonso@gmail.com",
+        "toEmail": "dsa069@inlumine.ual.es",
+        "subject": "\"¡Alerta de Error en n8n!",
+        "emailFormat": "text",
+        "text": "=Timestamp: {{ $now }}\nWorkflow Fallido: {{ $json.workflow.name }}\nNodo Fallido: {{ $json.execution.lastNodeExecuted }}\nMensaje de Error: {{ $json.execution.error.message }}\nURL de Ejecución: {{ $json.execution.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        -96
+      ],
+      "id": "eed389bf-8042-4859-9f1a-0348ddc3ab83",
+      "name": "Send email",
+      "webhookId": "e98141a6-b5f1-4090-a604-1b9551e372c5",
+      "credentials": {
+        "smtp": {
+          "id": "tKCIJfSxFhoHE4wr",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log error",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log error": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9d6b4438-9b06-4cb8-ac58-12a246b40d30",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "KCrtNtsy7WpPcLIO",
+  "tags": []
+}

@@ -1,0 +1,1348 @@
+{
+  "name": "Practica03_4.3",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ed9cb40b-2f9d-431b-8ead-202173e5ce9e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simula 5 tareas vacías\nconst tareas = [];\n\nfor (let i = 1; i <= 5; i++) {\n  tareas.push({\n    id: i\n  });\n}\n\nreturn tareas.map(tarea => ({ json: tarea }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a88828a2-b530-478b-9e7c-afb3d3d00c84",
+      "name": "Generación items"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const priorities = [\"Alta\", \"Media\", \"Baja\"];\nconst types = [\"Técnico\", \"Marketing\", \"Administrativo\"];\n\nconst randomPriority = priorities[Math.floor(Math.random() * priorities.length)];\nconst randomType = types[Math.floor(Math.random() * types.length)];\n\nreturn {\n  json: {\n    taskId: $('Generación items').item.json.id,\n    activity: $json.activity,\n    priority: randomPriority,\n    type: randomType\n  }\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        0
+      ],
+      "id": "53fe44ba-a95b-42fc-ac0f-e8393ba84ec9",
+      "name": "Prioridad y tipo"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Alta",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b17297e7-554d-40ed-b81f-1870a7ae6c91"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "15921b8b-8192-46bf-9d7c-0d66a4b0bb9d",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Media",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6ad5334a-02cd-4c94-ab6d-2c99734309b7",
+                    "leftValue": "={{ $json.priority }}",
+                    "rightValue": "Baja",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        816,
+        -16
+      ],
+      "id": "932acf60-601a-44c0-bd8a-bc717c138c27",
+      "name": "Switch prioridad"
+    },
+    {
+      "parameters": {
+        "url": "https://bored-api.appbrewery.com/random",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        400,
+        0
+      ],
+      "id": "ffebda85-4fbe-4d8c-b52f-9efa06ee88f4",
+      "name": "Obtener actividades"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Técnico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "853669a3-f5b0-46d9-971a-1a86eeb38998"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c45cb360-2e06-4317-85e1-ef64cb97a4ae",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0773bbd1-5292-4e65-94cb-091ea294836d",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Administrativo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        -240
+      ],
+      "id": "90db3082-a019-4cd3-bbb6-42a45064270a",
+      "name": "Switch tipo"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Técnico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "853669a3-f5b0-46d9-971a-1a86eeb38998"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c45cb360-2e06-4317-85e1-ef64cb97a4ae",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0773bbd1-5292-4e65-94cb-091ea294836d",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Administrativo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "ff0352c0-b7d1-4942-be0d-23a541c5c67b",
+      "name": "Switch tipo1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Técnico",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "853669a3-f5b0-46d9-971a-1a86eeb38998"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c45cb360-2e06-4317-85e1-ef64cb97a4ae",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Marketing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0773bbd1-5292-4e65-94cb-091ea294836d",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "Administrativo",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1024,
+        240
+      ],
+      "id": "dd787bd9-ed63-4da8-aa99-ed047e481e92",
+      "name": "Switch tipo2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 824891121,
+          "mode": "list",
+          "cachedResultName": "Tareas_Tecnicas_Alta",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=824891121"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        -576
+      ],
+      "id": "7c2ac001-ba7b-4f6b-86ad-261c5faea6d8",
+      "name": "Tareas_Tecnicas_Alta",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1134527086,
+          "mode": "list",
+          "cachedResultName": "Tareas_Marketing_Alta",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=1134527086"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        -432
+      ],
+      "id": "be429e31-df4e-4fe0-b3c1-63f46f009050",
+      "name": "Tareas_Marketing_Alta",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 202083515,
+          "mode": "list",
+          "cachedResultName": "Tareas_Administrativas_Alta",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=202083515"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        -288
+      ],
+      "id": "f75b73a4-a871-4230-9c34-df5c8b24b481",
+      "name": "Tareas_Administrativas_Alta",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 296985176,
+          "mode": "list",
+          "cachedResultName": "Tareas_Tecnicas_Media",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=296985176"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        -112
+      ],
+      "id": "fce3d552-8940-472f-b938-8d80b01bc162",
+      "name": "Tareas_Tecnicas_Media",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 134581232,
+          "mode": "list",
+          "cachedResultName": "Tareas_Marketing_Media",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=134581232"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        32
+      ],
+      "id": "a53c01ba-ebb5-4329-9db5-9f510df06549",
+      "name": "Tareas_Marketing_Media",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1053295190,
+          "mode": "list",
+          "cachedResultName": "Tareas_Administrativas_Media",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=1053295190"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        176
+      ],
+      "id": "f9809be9-4067-48b9-85f1-67132c66f4dd",
+      "name": "Tareas_Administrativas_Media",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 753886489,
+          "mode": "list",
+          "cachedResultName": "Tareas_Tecnicas_Baja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=753886489"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        352
+      ],
+      "id": "bb14989b-aded-4b88-9e69-c805b18e8bbf",
+      "name": "Tareas_Tecnicas_Baja",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1420829750,
+          "mode": "list",
+          "cachedResultName": "Tareas_Marketing_Baja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=1420829750"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        496
+      ],
+      "id": "f745c099-0a34-400b-a557-29c4f96091ca",
+      "name": "Tareas_Marketing_Baja",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1656238426,
+          "mode": "list",
+          "cachedResultName": "Tareas_Administrativas_Baja",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=1656238426"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.activity }}",
+            "Hora_asignación": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1264,
+        640
+      ],
+      "id": "b4599a3e-037a-4ed9-9282-6709596bfb9a",
+      "name": "Tareas_Administrativas_Baja",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 9
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1680,
+        -80
+      ],
+      "id": "d07453d4-c9af-4fc7-afe4-1f14e829ea25",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw",
+          "mode": "list",
+          "cachedResultName": "Actividades por prioridad y tipo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Registro_General",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/18pGIbL7Kd9tOB0eg8_1zvTSkmIaE_zHa5EMQSPlM0Uw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Actividad": "={{ $json.Actividad }}",
+            "Hora_asignación": "={{ $json['Hora_asignación'] }}",
+            "Prioridad": "={{ $('Prioridad y tipo').item.json.priority }}",
+            "Tipo": "={{ $('Prioridad y tipo').item.json.type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Actividad",
+              "displayName": "Actividad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Prioridad",
+              "displayName": "Prioridad",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tipo",
+              "displayName": "Tipo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Hora_asignación",
+              "displayName": "Hora_asignación",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1872,
+        32
+      ],
+      "id": "95ba186d-550f-4e3e-aeb2-42157a64baae",
+      "name": "Registro_General",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "8guXYcY0d5pQ5JAA",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generación items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generación items": {
+      "main": [
+        [
+          {
+            "node": "Obtener actividades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prioridad y tipo": {
+      "main": [
+        [
+          {
+            "node": "Switch prioridad",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener actividades": {
+      "main": [
+        [
+          {
+            "node": "Prioridad y tipo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch prioridad": {
+      "main": [
+        [
+          {
+            "node": "Switch tipo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch tipo1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch tipo2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch tipo": {
+      "main": [
+        [
+          {
+            "node": "Tareas_Tecnicas_Alta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Marketing_Alta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Administrativas_Alta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch tipo1": {
+      "main": [
+        [
+          {
+            "node": "Tareas_Tecnicas_Media",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Marketing_Media",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Administrativas_Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch tipo2": {
+      "main": [
+        [
+          {
+            "node": "Tareas_Tecnicas_Baja",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Marketing_Baja",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Tareas_Administrativas_Baja",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tareas_Marketing_Media": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "Tareas_Tecnicas_Media": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Tareas_Administrativas_Alta": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Tareas_Marketing_Alta": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Tareas_Tecnicas_Alta": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tareas_Administrativas_Media": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "Tareas_Tecnicas_Baja": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 6
+          }
+        ]
+      ]
+    },
+    "Tareas_Marketing_Baja": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 7
+          }
+        ]
+      ]
+    },
+    "Tareas_Administrativas_Baja": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 8
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Registro_General",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "96748eba-bda5-45f0-9f4b-a707778bca86",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "iQty7WKfOHBclEFc",
+  "tags": []
+}

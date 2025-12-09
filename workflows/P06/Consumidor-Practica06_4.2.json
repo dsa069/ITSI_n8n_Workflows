@@ -1,0 +1,99 @@
+{
+  "name": "Consumidor-Practica06_4.2",
+  "nodes": [
+    {
+      "parameters": {
+        "queue": "task_completed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmqTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "fb451ddb-f899-46da-b1bf-cef948488160",
+      "name": "RabbitMQ Trigger",
+      "credentials": {
+        "rabbitmq": {
+          "id": "g9Wk1O5yeFHbVkVe",
+          "name": "RabbitMQ (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "danielsalasalonso@gmail.com",
+        "toEmail": "dsa069@inlumine.ual.es",
+        "subject": "Tarea Completada",
+        "emailFormat": "text",
+        "text": "=Se ha completado la siguiente tarea:\n\nId: {{ $json.id }}\nTítulo: {{ $json.title }}\nDescripción: {{ $json.description }}\nCompletada?: {{ $json.done }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "dd87ae09-0141-40f2-ad6a-83638736ee61",
+      "name": "Send email",
+      "webhookId": "a9cb188f-e1a5-4ad1-94fe-fdf633653fa7",
+      "credentials": {
+        "smtp": {
+          "id": "tKCIJfSxFhoHE4wr",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Convierte el string \"content\" a JSON real\nconst data = JSON.parse($json.content);\n\n// Devuelve el contenido como JSON normal\nreturn [{ \n  id: data.id,\n  title: data.title,\n  description: data.description,\n  done: data.done\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ce1103c3-2d61-4275-8039-d3669e5627bf",
+      "name": "Separar el string en json"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "RabbitMQ Trigger": {
+      "main": [
+        [
+          {
+            "node": "Separar el string en json",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar el string en json": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "aaa87ba1-d49d-467f-97d5-0af4854789ca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "s97OtsZJD6IMZMGb",
+  "tags": []
+}

@@ -1,0 +1,87 @@
+{
+  "name": "Productor-Practica06_4.2",
+  "nodes": [
+    {
+      "parameters": {
+        "queue": "task_completed",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a97e89b7-47df-4073-bf28-12057133cb58",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "g9Wk1O5yeFHbVkVe",
+          "name": "RabbitMQ (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "http://web:5000/tasks/7/complete",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "01b0335d-c20c-4b8b-87ba-c9534d78f5bf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "a82fb297-bd93-407a-b0cf-a0536e0cbb55",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a9eaf5bd-e658-41ac-b044-1e54e08ecb46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "JnYUNmcfZcCbotUH",
+  "tags": []
+}

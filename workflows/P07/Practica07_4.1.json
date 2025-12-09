@@ -1,0 +1,145 @@
+{
+  "name": "Practica07_4.1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "341b8f26-1e20-4ccd-9f38-f85c9f0b7361",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM task WHERE description IS NOT NULL AND description != '' LIMIT 5;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bc02adc4-7296-4ce4-94d5-987e1694b514",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "UGgULuWCWJwpkRDy",
+          "name": "PostgreSQL (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un jefe de proyecto experimentado. Basándote en la siguiente descripción de una tarea, genera un resumen conciso de una sola frase (máximo 15 palabras) para la siguiente tarea: \"{{ $json.description }}\n\nNO INDIQUES EL NUMERO DE PALABRAS AL FINAL NI PONGAS ASTERISCOS. SOLO TEXTO."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "43bee1e8-519e-4729-9d48-98611177e8a4",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Ct6OZR9geOMesFj",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "889d530a-5e4e-4f05-adba-c2bbd536b4ee",
+              "name": "id",
+              "value": "={{ $('Execute a SQL query').item.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "8eb91071-574d-44e5-af3b-ed100c1fed69",
+              "name": "resumen",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        0
+      ],
+      "id": "92751fda-25e8-4d51-9cf1-724ae4251cd6",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "45010c8f-f0b1-4657-86b3-662f6b95f91e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "oW8ygfve7Pmh204m",
+  "tags": []
+}

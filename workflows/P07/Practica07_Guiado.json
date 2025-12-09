@@ -1,0 +1,216 @@
+{
+  "name": "Practica07_Guiado",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "126f64c0-9a4b-4c2c-a1e1-deea1a2fe391",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM task WHERE description IS NOT NULL AND description != '' LIMIT 5;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "18632bbf-039f-4c48-bdd3-e020d9abd3c7",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "postgres": {
+          "id": "UGgULuWCWJwpkRDy",
+          "name": "PostgreSQL (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-pro-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-pro-latest"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Eres un jefe de proyecto experimentado. Basándote en la siguiente descripción de una tarea, determina su prioridad. Responde ÚNICAMENTE con una de estas tres palabras: ALTA, MEDIA o BAJA.\n\nDescripción de la tarea: \"{{ $json.description}}\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "0d52c2b3-2753-41f1-ade0-c3a89d0e5ed3",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "8Ct6OZR9geOMesFj",
+          "name": "Gemini Key"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.content.parts[0].text }}",
+                    "rightValue": "ALTA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "858b83fd-9bec-4a21-89d7-8edae16c5095"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "8dcc514e-e796-4a67-b7c6-81d687de0f47",
+                    "leftValue": "={{ $json.content.parts[0].text }}",
+                    "rightValue": "MEDIA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "a64df6dc-f7f5-45d2-ba29-e0f66d8cdab1",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "fromEmail": "danielsalasalonso@gmail.com",
+        "toEmail": "dsa069@inlumine.ual.es",
+        "subject": "¡Alerta de Tarea Prioridad ALTA!",
+        "emailFormat": "text",
+        "text": "=La tarea \"{{ $('Execute a SQL query').item.json.title }}\" (ID: {{ $('Execute a SQL query').item.json.id }}) ha sido clasificada como ALTA prioridad por la IA.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        -32
+      ],
+      "id": "dfd5b5dc-982d-493b-b68b-75cae6fbd37b",
+      "name": "Send email",
+      "webhookId": "75d06f57-b999-4515-964f-127de7a20ce1",
+      "credentials": {
+        "smtp": {
+          "id": "tKCIJfSxFhoHE4wr",
+          "name": "SMTP account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "93105ba5-24f7-4186-9655-bab597be8765",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "osHwdtWW0q2NpJ9t",
+  "tags": []
+}

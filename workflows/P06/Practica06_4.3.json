@@ -1,0 +1,261 @@
+{
+  "name": "Practica06_4.3",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d85ac6db-384d-4160-b588-0be3d8331ed7",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        16
+      ],
+      "id": "85b138e1-e274-464f-b856-4fe25f52a370",
+      "name": "Webhook",
+      "webhookId": "d85ac6db-384d-4160-b588-0be3d8331ed7"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "list",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "value": "task",
+          "mode": "list",
+          "cachedResultName": "task"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "done": false,
+            "title": "={{ $json.body.title }}",
+            "description": "={{ $json.body.description }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "done",
+              "displayName": "done",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        416,
+        -64
+      ],
+      "id": "e10367c3-29d9-4741-9d5d-bc349d411c8a",
+      "name": "Insert rows in a table",
+      "credentials": {
+        "postgres": {
+          "id": "UGgULuWCWJwpkRDy",
+          "name": "PostgreSQL (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "queue": "task_created",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.rabbitmq",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        -64
+      ],
+      "id": "350eca73-71fc-4266-a8af-991062a17fa4",
+      "name": "RabbitMQ",
+      "credentials": {
+        "rabbitmq": {
+          "id": "g9Wk1O5yeFHbVkVe",
+          "name": "RabbitMQ (Tasks)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={\n  \"id\": {{ $('Insert rows in a table').item.json.id }},\n  \"title\": {{ $('Insert rows in a table').item.json.title }},\n  \"description\": {{ $('Insert rows in a table').item.json.description }},\n  \"done\": {{ $('Insert rows in a table').item.json.done }}\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        832,
+        -64
+      ],
+      "id": "41be4bc9-5753-4c1e-a0a9-a33d9c059d31",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c233dbf3-350a-4e43-a7b4-489a23c6dd2f",
+              "leftValue": "={{ $json.body.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "3e719bb4-cdc2-4450-918c-6aec1abd272a",
+              "leftValue": "={{ $json.body.title }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        16
+      ],
+      "id": "c1f33879-42c0-4cb7-95d1-5bf46dd3ffad",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "errorMessage": "400 Bad Request"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        416,
+        112
+      ],
+      "id": "1d494a6a-c776-4cd2-9d03-579d877d46a4",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert rows in a table": {
+      "main": [
+        [
+          {
+            "node": "RabbitMQ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "RabbitMQ": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert rows in a table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d717ae58-5693-4c61-8a14-c60d01df8fed",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "61dbf6bdf21963d602fbd0e62dc34c112538fe386afb9f70310e0416a1cdf6d5"
+  },
+  "id": "xhzbKHo79agywenp",
+  "tags": []
+}
