@@ -11,6 +11,7 @@ Este repositorio contiene una colección de flujos de trabajo de n8n desarrollad
 - `.env`: Archivo de variables de entorno (ignorado en Git).
 - `.gitignore`: Especifica archivos a ignorar en el control de versiones.
 - `.github/workflows/deploy.yml`: Flujo de trabajo de GitHub Actions para desplegar flujos específicos a producción.
+- `memorias/`: Directorio que contiene memorias y documentación de las prácticas realizadas.
 
 ## Prerrequisitos
 
